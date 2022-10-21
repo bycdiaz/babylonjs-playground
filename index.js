@@ -76,6 +76,12 @@ const createScene = function () {
       }
     });
 
+    const environment = scene.createDefaultEnvironment({ enableGroundShadow: true, groundYBias: 2.8 });
+    environment.setMainColor(BABYLON.Color3.FromHexString("#74b9ff"));
+  
+    const vrHelper = scene.createDefaultVRExperience({createDeviceOrientationCamera:false, useXR: true});
+    vrHelper.enableTeleportation({floorMeshes: [environment.ground]});
+
     return scene;
 };
 
