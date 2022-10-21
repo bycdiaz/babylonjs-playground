@@ -49,12 +49,27 @@ const createScene = function () {
     text("Card Sort, But make it 3D. Wow.", 2, 0);
 
     scene.registerBeforeRender(function () {
-      if (sphere.intersectsMesh(box1, false) || sphere.intersectsMesh(box2, false)) {
-        console.log('intersection!');
-        sphere.material.emissiveColor = new BABYLON.Color3(1, 0, 0);
-      } else {
-        sphere.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
+      const sphereContactBox1 = sphere.intersectsMesh(box1, true);
+      const sphereContactBox2 = sphere.intersectsMesh(box2, true);
+      const sphereContactsBox = sphereContactBox1 || sphereContactBox2;
 
+      if (sphereContactsBox) {
+        sphere.material.emissiveColor = new BABYLON.Color3(150, 0, 0);
+      } else {
+        sphere.material.emissiveColor = new BABYLON.Color3(0, 90 , 0);
+        
+      }
+
+      if (sphereContactBox1) {
+        box1.material.emissiveColor = new BABYLON.Color3(0, 90, 0);
+      } else {
+        box1.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
+      }
+
+      if (sphereContactBox2) {
+        box2.material.emissiveColor = new BABYLON.Color3(0, 90, 0);
+      } else {
+        box2.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
       }
     });
 
@@ -131,9 +146,11 @@ function button(direction, sphere, position) {
 function makeBoxes(scene) {
   const box1 = BABYLON.MeshBuilder.CreateBox('box', scene);
   box1.position.x = -2;
+  box1.material = new BABYLON.StandardMaterial("", scene);
 
   const box2 = BABYLON.MeshBuilder.CreateBox('box', scene);
   box2.position.x = 2;
+  box2.material = new BABYLON.StandardMaterial("", scene);
 
   return [box1, box2];
 }
