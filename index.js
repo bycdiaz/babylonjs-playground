@@ -49,24 +49,27 @@ const createScene = function () {
     text("Card Sort, But make it 3D. Wow.", 2, 0);
 
     scene.registerBeforeRender(function () {
-      const sphereContactBox1 = sphere.intersectsMesh(box1, true);
-      const sphereContactBox2 = sphere.intersectsMesh(box2, true);
+      const sphereContactBox1 = !!sphere.intersectsMesh(box1, false);
+      const sphereContactBox2 = !!sphere.intersectsMesh(box2, false);
       const sphereContactsBox = sphereContactBox1 || sphereContactBox2;
 
+      // TODO Explore why contact is detected upon rendering scene
       if (sphereContactsBox) {
+        console.log('contact!');
         sphere.material.emissiveColor = new BABYLON.Color3(150, 0, 0);
       } else {
-        sphere.material.emissiveColor = new BABYLON.Color3(0, 90 , 0);
-        
+        sphere.material.emissiveColor = new BABYLON.Color3(0, 0 , 0);
       }
 
       if (sphereContactBox1) {
-        box1.material.emissiveColor = new BABYLON.Color3(0, 90, 0);
+        console.log('contact with box 1');
+        box1.material.emissiveColor = new BABYLON.Color3(0, 60, 0);
       } else {
         box1.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
       }
 
       if (sphereContactBox2) {
+        console.log('contact with box 2');
         box2.material.emissiveColor = new BABYLON.Color3(0, 90, 0);
       } else {
         box2.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
@@ -145,11 +148,11 @@ function button(direction, sphere, position) {
 
 function makeBoxes(scene) {
   const box1 = BABYLON.MeshBuilder.CreateBox('box', scene);
-  box1.position.x = -2;
+  box1.position.x = -3;
   box1.material = new BABYLON.StandardMaterial("", scene);
 
   const box2 = BABYLON.MeshBuilder.CreateBox('box', scene);
-  box2.position.x = 2;
+  box2.position.x = 3;
   box2.material = new BABYLON.StandardMaterial("", scene);
 
   return [box1, box2];
