@@ -23,37 +23,40 @@ const createScene = function () {
     pointerDragBehavior.useObjectOrientationForDragging = false;
 
     // Listen to drag events
-    // pointerDragBehavior.onDragStartObservable.add((event)=>{
-    //     console.log("dragStart");
-    //     console.log(event);
-    // })
-    // pointerDragBehavior.onDragObservable.add((event)=>{
-    //     console.log("drag");
-    //     console.log(event);
-    // })
-    // pointerDragBehavior.onDragEndObservable.add((event)=>{
-    //     console.log("dragEnd");
-    //     console.log(event);
-    // })
+    pointerDragBehavior.onDragStartObservable.add((event)=>{
+        console.log("dragStart");
+        console.log(event);
+    })
+    pointerDragBehavior.onDragObservable.add((event)=>{
+        console.log("drag");
+        console.log(event);
+    })
+    pointerDragBehavior.onDragEndObservable.add((event)=>{
+        console.log("dragEnd");
+        console.log(event);
+    })
 
     // Built-in 'sphere' shape.
     const sphere = BABYLON.MeshBuilder.CreateSphere("sphere", 
         { diameter: 1, segments: 16 }, scene);
+    sphere.material = new BABYLON.StandardMaterial("", scene);
 
     sphere.addBehavior(pointerDragBehavior);
 
-    makeBoxes(scene);
+    const [box1, box2] = makeBoxes(scene);
     createButtons(sphere);
 
-    const advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+    text("Card Sort, But make it 3D. Wow.", 2, 0);
 
-    const title = new BABYLON.GUI.TextBlock();
-    title.text = "Card Sort, But make it 3D";
-    title.color = 'white';
-    title.textHorizontalAlignment = 2;
-    title.textVerticalAlignment = 0;
-    title.fontSize = 24;
-    advancedTexture.addControl(title);   
+    scene.registerBeforeRender(function () {
+      if (sphere.intersectsMesh(box1, false) || sphere.intersectsMesh(box2, false)) {
+        console.log('intersection!');
+        sphere.material.emissiveColor = new BABYLON.Color3(1, 0, 0);
+      } else {
+        sphere.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
+
+      }
+    });
 
     return scene;
 };
@@ -106,7 +109,7 @@ function button(direction, sphere, position) {
           console.log(`Unknown direction: ${direction}.`);
       }
     }
-
+    console.log(sphere.position);
   })
 
   button.addEventListener('keydown', event => {
@@ -121,6 +124,7 @@ function button(direction, sphere, position) {
         sphere.position.x += sphereStep;
       }
     }
+    console.log(sphere.position);
   })
 }
 
@@ -130,4 +134,18 @@ function makeBoxes(scene) {
 
   const box2 = BABYLON.MeshBuilder.CreateBox('box', scene);
   box2.position.x = 2;
+
+  return [box1, box2];
+}
+
+function text(text, horizontalAlignment = 0, verticalAlignment = 0) {
+  const advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+
+  const title = new BABYLON.GUI.TextBlock();
+  title.text = text;
+  title.color = 'white';
+  title.textHorizontalAlignment = horizontalAlignment;
+  title.textVerticalAlignment = verticalAlignment;
+  title.fontSize = 40;
+  advancedTexture.addControl(title);
 }
