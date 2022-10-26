@@ -3,14 +3,41 @@ const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engi
 const createScene = function () {
     // Creates a basic Babylon Scene object
     const scene = new BABYLON.Scene(engine);
+    
+    
+    // *** CAMERA 1 ****
     // Creates and positions a free camera
     const camera = new BABYLON.FreeCamera("camera1", 
-        new BABYLON.Vector3(0, 5, -10), scene);
+        new BABYLON.Vector3(0, 2, -10), scene);
         
     // Targets the camera to scene origin
     camera.setTarget(BABYLON.Vector3.Zero());
     // This attaches the camera to the canvas
     camera.attachControl(canvas, true);
+
+
+    // *** CAMERA 2 ****
+    // const camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 10, new BABYLON.Vector3(0, 0, 0), scene);
+
+    // // This positions the camera
+    // camera.setPosition(new BABYLON.Vector3(0, 2, -10));
+
+    // // This attaches the camera to the canvas
+    // camera.attachControl(canvas, true);
+
+    const zDistanceBehindArcCamera = -15;
+    const polyhedron = BABYLON.MeshBuilder.CreatePolyhedron("shape", { type: 13 }, scene);
+    polyhedron.position.z = zDistanceBehindArcCamera;
+
+    const polyhedron2 = BABYLON.MeshBuilder.CreatePolyhedron("shape", { type: 14 }, scene);
+    polyhedron2.position.z = zDistanceBehindArcCamera;
+    polyhedron2.position.x = 3;
+
+    const polyhedron3 = BABYLON.MeshBuilder.CreatePolyhedron("shape", { type: 0, size: .5 }, scene);
+    polyhedron3.position.z = zDistanceBehindArcCamera;
+    polyhedron3.position.x = -3;
+
+
     // Creates a light, aiming 0,1,0 - to the sky
     const light = new BABYLON.HemisphericLight("light", 
         new BABYLON.Vector3(0, 1, 0), scene);
@@ -40,20 +67,22 @@ const createScene = function () {
     const sphere = BABYLON.MeshBuilder.CreateSphere("sphere", 
         { diameter: 1, segments: 16 }, scene);
     sphere.material = new BABYLON.StandardMaterial("", scene);
-
     sphere.addBehavior(pointerDragBehavior);
 
+    // const snowPerson = BABYLON.SceneLoader.ImportMeshAsync("", "https://assets.babylonjs.com/meshes/Demos/Snow_Man_Scene/", "snowMan.glb", scene);
+
+
     const [box1, box2] = makeBoxes(scene);
+
     createButtons(sphere);
 
     text("Card Sort, But make it 3D. Wow.", 2, 0);
 
     scene.registerBeforeRender(function () {
-      const sphereContactBox1 = !!sphere.intersectsMesh(box1, false);
-      const sphereContactBox2 = !!sphere.intersectsMesh(box2, false);
+      const sphereContactBox1 = !!sphere.intersectsMesh(box1, true);
+      const sphereContactBox2 = !!sphere.intersectsMesh(box2, true);
       const sphereContactsBox = sphereContactBox1 || sphereContactBox2;
 
-      // TODO Explore why contact is detected upon rendering scene
       if (sphereContactsBox) {
         console.log('contact!');
         sphere.material.emissiveColor = new BABYLON.Color3(150, 0, 0);
@@ -77,10 +106,9 @@ const createScene = function () {
     });
 
     const environment = scene.createDefaultEnvironment({ enableGroundShadow: true, groundYBias: 2.8 });
-    environment.setMainColor(BABYLON.Color3.FromHexString("#74b9ff"));
-  
+    environment.setMainColor(BABYLON.Color3.FromHexString("#4781b9"));
     const vrHelper = scene.createDefaultVRExperience({createDeviceOrientationCamera:false, useXR: true});
-    vrHelper.enableTeleportation({floorMeshes: [environment.ground]});
+    vrHelper.enableTeleportation({ floorMeshes: [environment.ground] });
 
     return scene;
 };
@@ -153,13 +181,18 @@ function button(direction, sphere, position) {
 }
 
 function makeBoxes(scene) {
-  const box1 = BABYLON.MeshBuilder.CreateBox('box', scene);
-  box1.position.x = -3;
+  const box1 = BABYLON.MeshBuilder.CreateBox('box', {
+    size: 1.5
+  }, scene);
+  box1.position.x = -4;
   box1.material = new BABYLON.StandardMaterial("", scene);
 
-  const box2 = BABYLON.MeshBuilder.CreateBox('box', scene);
-  box2.position.x = 3;
+  const box2 = BABYLON.MeshBuilder.CreateBox('box', {
+    size: 1.5
+  }, scene);
+  box2.position.x = 4;
   box2.material = new BABYLON.StandardMaterial("", scene);
+
 
   return [box1, box2];
 }
